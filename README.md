@@ -1,5 +1,5 @@
 # js.message
-* 一款原生js增强插件
+* 一款原生js增强插件，forked from bailinx/js.message
 * 重写alert和confirm
 *
 
@@ -38,6 +38,11 @@ function funConfirm() {
 * ~~组件中(匿名)事件重复绑定问题(v1.0.1)~~
 
 ## 更新日志
+#### Message v1.0.3 -2020/7/21
+* 修改图标
+* 修改按钮CSS样式，不再使用图片背景
+* alert可以设置图标，并且修正仅第一次会显示图标，再次用alert不显示图标的问题
+
 #### Message v1.0.2 -2015/12/02
 * 完善内部事件处理方法
 * 修改完善逻辑

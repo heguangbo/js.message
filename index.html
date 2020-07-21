@@ -86,9 +86,10 @@
             message.confirm(msg, callBack);
         }
         function funAlert() {
-            alert("操作已成功", function() {
+            var message = new Message();
+            message.alert("操作已成功", function() {
                 console.log('操作已成功');
-            });
+            },message.ICON.QUESTION);
         }
         function funConfirm() {
             confirm("操作已成功", function(result) {

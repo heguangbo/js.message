@@ -1,9 +1,9 @@
 /*!
  * Message Javascript Library
- * radishj - v1.0.2 (2015-12-02 14:03:58)
+ * radishj - v1.0.0 (2015-11-25 14:03:58)
  * https://github.com/RadishJ | Released under MIT license
  */
-var Message = function() {
+var Message = function () {
     "use strict";
 }
 /**
@@ -20,14 +20,16 @@ Message.prototype.TYPE = {
  */
 Message.prototype.ICON = {
     NONE: 0,
-    FAILED: 1,
-    SUCCESS: 2
+    WARN: 1,
+    SUCCESS: 2,
+    QUESTION: 3,
+    ERROR: 4
 }
 /**
  * 遮罩层是否存在
  * @return {[type]} [description]
  */
-Message.prototype.existMask = function() {
+Message.prototype.existMask = function () {
     var _mask = document.getElementsByClassName('ui-dialog-mask');
     if (!!_mask && !_mask.length) {
         return false;
@@ -39,7 +41,7 @@ Message.prototype.existMask = function() {
  * 显示遮罩层
  * @return {[type]} [description]
  */
-Message.prototype.showMask = function() {
+Message.prototype.showMask = function () {
     var _self = this;
     if (!_self.existMask()) {
         var _mask = document.createElement('div');
@@ -54,7 +56,7 @@ Message.prototype.showMask = function() {
  * 窗体是否存在
  * @return {[type]}
  */
-Message.prototype.existDialog = function() {
+Message.prototype.existDialog = function () {
     var _dialog = document.getElementsByClassName('ui-dialog');
     if (!!_dialog && !_dialog.length) {
         return false;
@@ -68,7 +70,7 @@ Message.prototype.existDialog = function() {
  * @param  {[type]} callBack 回调方法
  * @return {[type]}          [description]
  */
-Message.prototype.showDialog = function(msg, type, icon, callBack) {
+Message.prototype.showDialog = function (msg, type, icon, callBack) {
     var _self = this;
     if (!_self.existDialog()) {
         // <section class="ui-dialog">
@@ -80,7 +82,7 @@ Message.prototype.showDialog = function(msg, type, icon, callBack) {
         //      <span class="ui-dialog-close"></span>
         var _dialogClose = document.createElement('span');
         _dialogClose.className = "ui-dialog-close";
-        _self.base.addEvent(_dialogClose, 'click', function() {
+        _self.base.addEvent(_dialogClose, 'click', function () {
             _self.hide();
         });
         // 尝试过原生绑定事件，单匿名事件解绑始终是个问题
@@ -101,16 +103,20 @@ Message.prototype.showDialog = function(msg, type, icon, callBack) {
         if (_self.ICON.NONE === icon) {
             _dialogIcon.className = "ui-dialog-icon";
             _dialogIcon.style.display = "none";
-        } else if (_self.ICON.FAILED === icon) {
+        } else if (_self.ICON.WARN === icon) {
             _dialogIcon.className = "ui-dialog-icon ui-dialog-icon-warn";
         } else if (_self.ICON.SUCCESS === icon) {
             _dialogIcon.className = "ui-dialog-icon ui-dialog-icon-success";
+        } else if (_self.ICON.QUESTION === icon) {
+            _dialogIcon.className = "ui-dialog-icon ui-dialog-icon-question";
+        } else if (_self.ICON.ERROR === icon) {
+            _dialogIcon.className = "ui-dialog-icon ui-dialog-icon-error";
         }
 
         //          <h3 class="ui-dialog-title">
         var _dialogTitle = document.createElement('h3');
         _dialogTitle.className = "ui-dialog-title";
-        _dialogTitle.innerText = msg;
+        _dialogTitle.innerHTML = msg;
         //          <div class="ui-dialog-content">
         var _dialogContent = document.createElement('div');
         _dialogContent.className = "ui-dialog-content";
@@ -127,10 +133,10 @@ Message.prototype.showDialog = function(msg, type, icon, callBack) {
         _btnSure.className = "ui-btn-adapt ui-btn-adapt-basic-s";
         //                  <span>
         var _btnSureMsg = document.createElement('span');
-        _btnSureMsg.innerText = "确定";
+        _btnSureMsg.innerHTML = "OK";
         _btnSure.appendChild(_btnSureMsg);
         // sure event
-        _self.base.addEvent(_btnSure, 'click', function (){
+        _self.base.addEvent(_btnSure, 'click', function () {
             _self.hide();
             callBack(true);
         });
@@ -138,12 +144,12 @@ Message.prototype.showDialog = function(msg, type, icon, callBack) {
         var _btnCancle = document.createElement('div');
         _btnCancle.className = "ui-btn-adapt ui-btn-adapt-basic-c";
         var _btnCancleMsg = document.createElement('span');
-        _btnCancleMsg.innerText = "取消";
+        _btnCancleMsg.innerHTML = "Cancel";
         _btnCancle.appendChild(_btnCancleMsg);
         // cancle event
         if (_self.TYPE.CONFIRM === type) {
             // 若alert窗体，无需绑定cancle按钮，否则造成事件重复绑定
-            _self.base.addEvent(_btnCancle, 'click', function() {
+            _self.base.addEvent(_btnCancle, 'click', function () {
                 _self.hide();
                 callBack(false);
             });
@@ -177,39 +183,43 @@ Message.prototype.showDialog = function(msg, type, icon, callBack) {
         // 没必要重绘窗体
         var _dialog = document.getElementsByClassName('ui-dialog');
         var _dialogTitle = _dialog[0].getElementsByClassName("ui-dialog-title");
-        _dialogTitle[0].innerText = msg;
+        _dialogTitle[0].innerHTML = msg;
 
         var _btnSure = _dialog[0].getElementsByClassName('ui-btn-adapt-basic-s');
         var _btnCancle = _dialog[0].getElementsByClassName('ui-btn-adapt-basic-c');
         var _dialogIcon = _dialog[0].getElementsByClassName('ui-dialog-icon');
 
+        // 重置图标
+        _dialogIcon[0].style.display = "inline-block";
+        if (_self.ICON.NONE === icon) {
+            _dialogIcon[0].style.display = "none";
+        } else if (_self.ICON.WARN === icon) {
+            _dialogIcon[0].className = "ui-dialog-icon ui-dialog-icon-warn";
+        } else if (_self.ICON.SUCCESS === icon) {
+            _dialogIcon[0].className = "ui-dialog-icon ui-dialog-icon-success";
+        } else if (_self.ICON.QUESTION === icon) {
+            _dialogIcon[0].className = "ui-dialog-icon ui-dialog-icon-question";
+        } else if (_self.ICON.ERROR === icon) {
+            _dialogIcon[0].className = "ui-dialog-icon ui-dialog-icon-error";
+        }
+
         // 重置窗体
         if (_self.TYPE.CONFIRM === type) {
             _btnSure[0].style.display = "inline-block";
             _btnCancle[0].style.display = "inline-block";
-            // 重置图标
-            if (_self.ICON.NONE === icon) {
-                _dialogIcon[0].style.display = "none";
-            } else if (_self.ICON.FAILED === icon) {
-                _dialogIcon[0].className = "ui-dialog-icon ui-dialog-icon-warn";
-            } else if (_self.ICON.SUCCESS === icon) {
-                _dialogIcon[0].className = "ui-dialog-icon ui-dialog-icon-success";
-            }
-            _dialogIcon[0].style.display = "inline-block";
+
         } else {
             _btnSure[0].style.display = "inline-block";
             _btnCancle[0].style.display = "none";
-            // 重置图标
-            _dialogIcon[0].style.display = "none";
         }
         // 移除事件(试过自解绑匿名函数方法，然而后果是导致未触发的按钮的事件被重复绑定)
         _self.base.removeEvent(_btnSure[0], 'click');
         _self.base.removeEvent(_btnCancle[0], 'click');
-        _self.base.addEvent(_btnSure[0], 'click', function() {
+        _self.base.addEvent(_btnSure[0], 'click', function () {
             _self.hide();
             callBack(true);
         });
-        _self.base.addEvent(_btnCancle[0], 'click', function() {
+        _self.base.addEvent(_btnCancle[0], 'click', function () {
             _self.hide();
             callBack(false);
         });
@@ -221,7 +231,7 @@ Message.prototype.showDialog = function(msg, type, icon, callBack) {
  * 隐藏窗体
  * @return {[type]} [description]
  */
-Message.prototype.hide = function() {
+Message.prototype.hide = function () {
     var _self = this;
     if (_self.existDialog() && _self.existMask()) {
         document.getElementsByClassName('ui-dialog')[0].style.display = "none";
@@ -233,22 +243,25 @@ Message.prototype.hide = function() {
  * @param  {[type]} msg [description]
  * @return {[type]}     [description]
  */
-Message.prototype.alert = function(msg, callBack) {
+Message.prototype.alert = function (msg, callBack, icon) {
     var _self = this;
     _self.hide();
     _self.showMask();
-    _self.showDialog(msg, _self.TYPE.ALERT, _self.ICON.NONE, callBack);
+    if (typeof (icon) === 'undefined') {
+        icon = _self.ICON.NONE;
+    }
+    _self.showDialog(msg, _self.TYPE.ALERT, icon, callBack);
 }
 /**
  * 弹出Confirm窗体方法
  * @param  {[type]} msg [description]
  * @return {[type]}     [description]
  */
-Message.prototype.confirm = function(msg, callBack) {
+Message.prototype.confirm = function (msg, callBack) {
     var _self = this;
     _self.hide();
     _self.showMask();
-    _self.showDialog(msg, _self.TYPE.CONFIRM, _self.ICON.SUCCESS, callBack);
+    _self.showDialog(msg, _self.TYPE.CONFIRM, _self.ICON.QUESTION, callBack);
 }
 /**
  * Base方法
@@ -258,7 +271,7 @@ Message.prototype.confirm = function(msg, callBack) {
  * @type {Object}
  */
 Message.prototype.base = {
-    addEvent: function(element, type, handler) {
+    addEvent: function (element, type, handler) {
         // assign each event handler a unique ID
         if (!handler.$$guid) handler.$$guid = this.addEvent.guid++;
         // assign each element a unique ID
@@ -281,7 +294,7 @@ Message.prototype.base = {
     },
 
 
-    removeEvent: function(element, type, handler) {
+    removeEvent: function (element, type, handler) {
         // check if the element has a guid
         if (!element.$$guid) return;
         if (handler) {
@@ -297,7 +310,7 @@ Message.prototype.base = {
         }
 
     },
-    handleEvent: function(event) {
+    handleEvent: function (event) {
         // grab the event object (IE uses a global event object)
         event = event || window.event;
         // get a reference to the hash table of event handlers
